@@ -1,6 +1,6 @@
 # 💡 Introducción
 
-Este repositorio contiene la implementación completa de un sistema de **Seguridad y Administración** para la base de datos ficticia `empresa_segura`, utilizando **MySQL**.
+Este repositorio contiene la implementación completa de un sistema de **Seguridad y Administración** para la base de datos ficticia `empresa_segura`, utilizando **POSTRESQL**.
 
 El objetivo principal de este proyecto es demostrar la aplicación práctica de los principios de seguridad en bases de datos, cubriendo los siguientes pilares:
 
