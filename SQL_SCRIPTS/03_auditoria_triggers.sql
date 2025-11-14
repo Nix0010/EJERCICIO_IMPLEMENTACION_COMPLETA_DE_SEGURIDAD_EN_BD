@@ -1,12 +1,6 @@
--- -----------------------------------------------------------
--- Archivo 03: Auditoría (Trazabilidad)
--- Propósito: Crear la tabla de registro, la función PL/pgSQL y los
--- triggers para operaciones DML sobre la tabla 'empleados'.
--- -----------------------------------------------------------
 
-/* ======================================================
    03 - INFRAESTRUCTURA DE AUDITORÍA
-   ====================================================== */
+
 
 -- 1. TABLA FORENSE DE AUDITORÍA
 CREATE TABLE IF NOT EXISTS audit_log (
