@@ -12,7 +12,7 @@ _Reporte de Implementación de Seguridad en Bases de Datos_
  _1. Introducción y Principios de Seguridad_
 ----------------------------------------------
 
-Este reporte describe la implementación del sistema de **Seguridad, Control de Acceso y Auditoría** para la base de datos _empresa_segura_, utilizando **PostgreSQL**.  
+Este reporte describe la implementación del sistema de **Seguridad, Control de Acceso y Auditoría** para la base de datos _seguridad_empresa_, utilizando **PostgreSQL**.  
 El diseño se fundamenta en los principios esenciales de seguridad:
 
 - _Principio de Mínimo Privilegio_: cada usuario solo accede a lo estrictamente necesario.
