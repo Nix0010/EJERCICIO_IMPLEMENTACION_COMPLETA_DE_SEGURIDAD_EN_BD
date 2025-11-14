@@ -7,7 +7,7 @@ CREATE ROLE lector_rrhh;
 
 GRANT SELECT ON empleados TO lector_rrhh;
 GRANT SELECT ON departamentos TO lector_rrhh;
-GRANT SELECT ON historial_salarios TO lector_rrhh;
+GRANT SELECT ON salarios TO lector_rrhh;
 GRANT SELECT ON vista_empleados_salario_alto TO lector_rrhh;
 GRANT SELECT ON vista_empleados_por_fecha TO lector_rrhh;
 
@@ -17,7 +17,7 @@ CREATE ROLE admin_rrhh LOGIN PASSWORD 'Pass1234.'
 
 GRANT ALL PRIVILEGES ON empleados TO admin_rrhh;
 GRANT ALL PRIVILEGES ON departamentos TO admin_rrhh;
-GRANT ALL PRIVILEGES ON historial_salarios TO admin_rrhh;
+GRANT ALL PRIVILEGES ON salarios TO admin_rrhh;
 GRANT ALL PRIVILEGES ON vista_empleados_salario_alto TO admin_rrhh;
 GRANT ALL PRIVILEGES ON vista_empleados_por_fecha TO admin_rrhh;
 
