@@ -1,17 +1,11 @@
--- -----------------------------------------------------------
--- Archivo 00: Creación de la Base de Datos y Tablas (DDL)
--- Propósito: Establecer la estructura base del esquema 'seguridad_empresa'.
--- -----------------------------------------------------------
 
-/* ======================================================
    00 - CREAR BASE DE DATOS Y CONEXIÓN
-   ====================================================== */
--- CREATE DATABASE seguridad_empresa;
--- \c seguridad_empresa;
+   
+-CREATE DATABASE seguridad_empresa;
+\c seguridad_empresa;
 
-/* ======================================================
    01 - DEFINICIÓN DE TABLAS
-   ====================================================== */
+   
 CREATE TABLE IF NOT EXISTS departamentos (
     id_departamento SERIAL PRIMARY KEY,
     nombre VARCHAR(100) UNIQUE NOT NULL,
