@@ -19,8 +19,8 @@ CREATE TABLE departamentos (
     ubicacion VARCHAR(100)
 );
 
--- Tabla historial de salarios
-CREATE TABLE historial_salarios (
+
+CREATE TABLE salarios (
     id_historial SERIAL PRIMARY KEY,
     id_empleado INT NOT NULL REFERENCES empleados(id_empleado),
     salario_anterior NUMERIC(12,2) NOT NULL,
