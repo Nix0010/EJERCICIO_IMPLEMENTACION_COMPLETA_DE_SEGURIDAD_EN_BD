@@ -1,122 +1,87 @@
-# Reporte de Implementación de Seguridad en Bases de Datos
-PostgreSQL 
-Estudiante: Valery Alarcón
-Docente: Hely Suárez
+<div style="text-align:center; font-family:Georgia;">
 
+<h1><i><u>Trabajo de Base de Datos – Proyecto RRHH</u></i></h1>
 
-🌐 1. Introducción y Principios de Seguridad
+<h3><i>Autora: <b>Valery Alarcón</b></i></h3>
+<h3><i>Docente: <b>Hely Suárez</b></i></h3>
 
-Este reporte describe la implementación del sistema de Seguridad, Control de Acceso y Auditoría para la base de datos empresa_segura, utilizando PostgreSQL.
-El diseño se fundamenta en los principios esenciales de seguridad:
+</div>
 
-Principio de Mínimo Privilegio: cada usuario solo accede a lo estrictamente necesario.
+---
 
-Confidencialidad, Integridad y Disponibilidad (CID): asegurar que la información sea confiable, precisa y accesible.
+<h2><u><i>Objetivo</i></u></h2>
 
-Trazabilidad y responsabilidad: todas las operaciones críticas quedan registradas.
+<p style="font-size:17px;">
+Diseñar e implementar una base de datos para el área de Recursos Humanos en PostgreSQL, 
+incluyendo la creación de tablas, vistas, roles, usuarios y la asignación de permisos adecuados.
+</p>
 
-🛡️ 2. Control de Acceso y Roles Implementados
+---
 
-Para garantizar la seguridad, se establecieron roles y usuarios con permisos claramente delimitados.
+<h2><u><i>1. Tablas creadas</i></u></h2>
 
-🔷 Rol: admin_rrhh
+<h3><i>✧ Tabla <b>empleados</b></i></h3>
+<ul>
+  <li>id_empleado (PK)</li>
+  <li>nombre</li>
+  <li>apellido</li>
+  <li>fecha_contratacion</li>
+  <li>salario</li>
+  <li>id_departamento (FK)</li>
+</ul>
 
-Tipo: Rol administrativo con inicio de sesión.
+<h3><i>✧ Tabla <b>departamentos</b></i></h3>
+<ul>
+  <li>id_departamento (PK)</li>
+  <li>nombre</li>
+</ul>
 
-Permisos: SELECT, INSERT, UPDATE, DELETE sobre todas las tablas y vistas.
+<h3><i>✧ Tabla <b>historial_salarios</b></i></h3>
+<ul>
+  <li>id_historial (PK)</li>
+  <li>id_empleado (FK)</li>
+  <li>salario_anterior</li>
+  <li>fecha_cambio</li>
+</ul>
 
-Función: Gestionar la información del área de RRHH.
+---
 
-Seguridad: Contraseña con expiración (VALID UNTIL 90 days).
+<h2><u><i>2. Vistas creadas</i></u></h2>
 
-🔷 Rol: lector_rrhh
+<h3><i>✧ Vista <b>vista_empleados_salario_alto</b></i></h3>
+<p>Muestra los empleados con salario superior al promedio.</p>
 
-Tipo: Rol de lectura.
+<h3><i>✧ Vista <b>vista_empleados_por_fecha</b></i></h3>
+<p>Ordena empleados por fecha de contratación.</p>
 
-Permisos:
+---
 
-SELECT en todas las tablas (empleados, departamentos, historial_salarios).
+<h2><u><i>3. Roles definidos</i></u></h2>
 
-SELECT en vistas públicas:
+<h3 style="color:#1a73e8;"><i>🔹 Rol <b>lector_rrhh</b></i></h3>
+<p>Permite únicamente realizar consultas (SELECT) sobre las tablas y vistas.</p>
 
-vista_empleados_sin_datos_sensibles
+<h3 style="color:#d93025;"><i>🔹 Rol <b>admin_rrhh</b></i></h3>
+<p>
+Permite acceso total (ALL PRIVILEGES) a todas las tablas y vistas.  
+Incluye login, contraseña y fecha de expiración de 90 días.
+</p>
 
-vista_empleados_por_fecha
+---
 
-vista_empleados_salario_alto
+<h2><u><i>4. Usuario creado</i></u></h2>
 
-Función: Consultas sin riesgo de modificar datos sensibles.
+<h3><i>👤 Usuario <b>usuario_consulta</b></i></h3>
+<p>
+Se le asigna el rol <b>lector_rrhh</b>.<br>
+Contraseña: <b>User123.</b>
+</p>
 
-🔷 Usuario: usuario_consulta
+---
 
-Permisos: Exclusivamente hereda el rol lector_rrhh.
+<h2><u><i>5. Sentencias SQL</i></u></h2>
 
-Función: Acceder a reportes y realizar consultas seguras.
+<p><u>Crear rol lector:</u></p>
 
-🧿 3. Seguridad a Nivel de Datos mediante Vistas
-
-Para proteger información sensible se implementaron vistas que ocultan campos privados y validan los datos que ingresan a través de ellas.
-
-Vista	Mecanismo de Seguridad	Finalidad
-vista_empleados_sin_datos_sensibles	Oculta salary y birth_date	Protección de datos personales (PII).
-vista_empleados_salario_alto	Filtra solo salarios elevados	Consultas segmentadas sin exponer datos completos.
-vista_empleados_por_fecha	Filtro por hire_date + WITH CHECK OPTION	Garantiza integridad en inserciones y actualizaciones.
-
-Estas vistas permiten compartir información sin comprometer la privacidad ni la integridad del sistema.
-
-📜 4. Auditoría Transaccional y Registro de Cambios
-
-Se implementó un sistema de auditoría para registrar toda operación crítica realizada sobre la tabla empleados.
-
-✔ Tabla de Auditoría: audit_log
-
-Registra:
-
-Tabla afectada
-
-Tipo de operación (INSERT, UPDATE, DELETE)
-
-Usuario que ejecuta la acción
-
-Fecha y hora
-
-Datos OLD y NEW en formato JSONB
-
-✔ Triggers AFTER
-
-Se crearon los siguientes triggers:
-
-AFTER INSERT
-
-AFTER UPDATE
-
-AFTER DELETE
-
-Estos mecanismos garantizan trazabilidad completa y permiten reconstruir cualquier cambio ejecutado por los usuarios del sistema.
-
-💾 5. Estrategia de Backup y Disponibilidad
-
-Para asegurar la disponibilidad del sistema se implementaron procesos de respaldo y restauración:
-
-Backups completos mediante pg_dump.
-
-Restauraciones con pg_restore.
-
-Revisión y documentación de la configuración WAL (Write-Ahead Log).
-
-Con esto se garantiza que la base de datos pueda recuperarse ante:
-
-fallos del sistema,
-
-pérdida de datos,
-
-errores humanos,
-
-corrupción de archivos.
-
-La estrategia permite mantener la continuidad operativa y reducir al mínimo la pérdida de información.
-
-🌟 Conclusión
-
-El sistema diseñado por Valery Alarcón integra prácticas profesionales de seguridad para bases de datos, incluyendo control de accesos, vistas seguras, auditoría detallada y mecanismos de respaldo.
-Este proyecto refleja un enfoque sólido y moderno basado en las buenas prácticas de PostgreSQL.
+```sql
+CREATE ROLE lector_rrhh;
