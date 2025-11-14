@@ -1,6 +1,6 @@
 # *Introducción*
 
-Este documento presenta la implementación completa del sistema de **Seguridad, Control de Acceso y Auditoría** desarrollado para la base de datos _empresa_segura_, empleando el motor **PostgreSQL**.
+Este documento presenta la implementación completa del sistema de **Seguridad, Control de Acceso y Auditoría** desarrollado para la base de datos _seguridad_empresa_, empleando el motor **PostgreSQL**.
 
 El propósito central de este proyecto es demostrar cómo se aplican de manera práctica los mecanismos esenciales de seguridad en bases de datos corporativas, abordando los pilares fundamentales:
 
