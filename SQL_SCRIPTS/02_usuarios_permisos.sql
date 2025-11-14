@@ -1,23 +1,26 @@
+------------------------------------------------------------
+-- 02 - USUARIOS, ROLES Y PERMISOS
+------------------------------------------------------------
 
--- Contiene: Gestión de Usuarios, GRANTS, y Política de Expiración
--- (Sección 2 del Ejercicio - Entregable 2.5)
+-- Rol de consulta
+CREATE ROLE lector_rrhh;
 
--- 2. IMPLEMENTAR GESTIÓN DE USUARIOS
+GRANT SELECT ON empleados TO lector_rrhh;
+GRANT SELECT ON departamentos TO lector_rrhh;
+GRANT SELECT ON historial_salarios TO lector_rrhh;
+GRANT SELECT ON vista_empleados_salario_alto TO lector_rrhh;
+GRANT SELECT ON vista_empleados_por_fecha TO lector_rrhh;
 
--- PostgreSQL no tiene la cláusula PASSWORD EXPIRE en CREATE USER. Se crea solo la contraseña.
+-- Rol administrador con expiración en 90 días
+CREATE ROLE admin_rrhh LOGIN PASSWORD 'Pass1234.'
+    VALID UNTIL (CURRENT_TIMESTAMP + INTERVAL '90 days');
 
--- 2.1. Crear usuario 'admin_rrhh' con acceso total a tabla empleados
-CREATE USER admin_rrhh WITH PASSWORD 'Pass1234.';
-GRANT SELECT, INSERT, UPDATE, DELETE ON empleados TO admin_rrhh;
+GRANT ALL PRIVILEGES ON empleados TO admin_rrhh;
+GRANT ALL PRIVILEGES ON departamentos TO admin_rrhh;
+GRANT ALL PRIVILEGES ON historial_salarios TO admin_rrhh;
+GRANT ALL PRIVILEGES ON vista_empleados_salario_alto TO admin_rrhh;
+GRANT ALL PRIVILEGES ON vista_empleados_por_fecha TO admin_rrhh;
 
--- 2.2. Crear usuario 'analista_bi' con solo SELECT en todas las tablas
-CREATE USER analista_bi WITH PASSWORD 'Pass1234.';
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO analista_bi;
--- Se necesita permiso para la tabla de auditoría futura
-GRANT SELECT ON audit_log TO analista_bi; 
-
--- 2.3. Crear usuario 'desarrollador' con permisos de SELECT, INSERT, UPDATE
-CREATE USER desarrollador WITH PASSWORD 'Pass1234.';
-GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO desarrollador;
-
--- 2.4. La política de contraseñas de expiración debe ser gestionada externamente.
+-- Usuario lector
+CREATE USER usuario_consulta PASSWORD 'User123.';
+GRANT lector_rrhh TO usuario_consulta;
