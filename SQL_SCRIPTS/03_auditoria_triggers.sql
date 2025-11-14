@@ -1,38 +1,44 @@
-------------------------------------------------------------
--- 03 - AUDITORÍA Y TRIGGERS
-------------------------------------------------------------
+-- -----------------------------------------------------------
+-- Archivo 03: Auditoría (Trazabilidad)
+-- Propósito: Crear la tabla de registro, la función PL/pgSQL y los
+-- triggers para operaciones DML sobre la tabla 'empleados'.
+-- -----------------------------------------------------------
 
--- Tabla de auditoría
-CREATE TABLE audit_log (
-    id_auditoria SERIAL PRIMARY KEY,
-    nombre_tabla VARCHAR(100) NOT NULL,
-    operacion VARCHAR(10) NOT NULL,
-    usuario_ejecutor VARCHAR(50) NOT NULL,
-    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+/* ======================================================
+   03 - INFRAESTRUCTURA DE AUDITORÍA
+   ====================================================== */
+
+-- 1. TABLA FORENSE DE AUDITORÍA
+CREATE TABLE IF NOT EXISTS audit_log (
+    id_audit SERIAL PRIMARY KEY,
+    tabla_objeto VARCHAR(100) NOT NULL,
+    operacion VARCHAR(10) NOT NULL, -- INSERT, UPDATE, DELETE
+    usuario_ejecutor TEXT NOT NULL,
+    fecha_evento TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    datos_json JSONB
 );
 
--- Función general para registrar cambios
-CREATE OR REPLACE FUNCTION insertar_auditoria()
-RETURNS TRIGGER AS $$
+-- 2. FUNCIÓN PL/pgSQL PARA REGISTRO
+CREATE OR REPLACE FUNCTION registrar_auditoria() RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO audit_log(nombre_tabla, operacion, usuario_ejecutor)
-    VALUES (TG_TABLE_NAME, TG_OP, CURRENT_USER);
-    RETURN NEW;
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO audit_log(tabla_objeto, operacion, usuario_ejecutor, datos_json)
+        VALUES (TG_TABLE_NAME, TG_OP, CURRENT_USER, row_to_json(NEW)::jsonb);
+        RETURN NEW;
+    ELSIF TG_OP = 'UPDATE' THEN
+        -- Registra el estado antiguo y el nuevo en un solo JSONB
+        INSERT INTO audit_log(tabla_objeto, operacion, usuario_ejecutor, datos_json)
+        VALUES (TG_TABLE_NAME, TG_OP, CURRENT_USER, jsonb_build_object('old', row_to_json(OLD), 'new', row_to_json(NEW)));
+        RETURN NEW;
+    ELSIF TG_OP = 'DELETE' THEN
+        -- Registra el estado que fue eliminado
+        INSERT INTO audit_log(tabla_objeto, operacion, usuario_ejecutor, datos_json)
+        VALUES (TG_TABLE_NAME, TG_OP, CURRENT_USER, row_to_json(OLD)::jsonb);
+        RETURN OLD;
+    END IF;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
-------------------------------------------------------------
--- TRIGGERS SOBRE LAS TABLAS
-------------------------------------------------------------
-
-CREATE TRIGGER trg_audit_log_empleados
-AFTER INSERT OR UPDATE OR DELETE ON empleados
-FOR EACH ROW EXECUTE FUNCTION insertar_auditoria();
-
-CREATE TRIGGER trg_audit_log_departamentos
-AFTER INSERT OR UPDATE OR DELETE ON departamentos
-FOR EACH ROW EXECUTE FUNCTION insertar_auditoria();
-
-CREATE TRIGGER trg_audit_log_salarios
-AFTER INSERT OR UPDATE OR DELETE ON historial_salarios
-FOR EACH ROW EXECUTE FUNCTION insertar_auditoria();
+-- 3. TRIGGER AFTER
+CREATE TRIGGER trg_empleados_audit AFTER INSERT OR UPDATE OR DELETE ON empleados
+FOR EACH ROW EXECUTE FUNCTION registrar_auditoria();
