@@ -1,4 +1,4 @@
-# 💡 *Introducción*
+# *Introducción*
 
 Este documento presenta la implementación completa del sistema de **Seguridad, Control de Acceso y Auditoría** desarrollado para la base de datos _empresa_segura_, empleando el motor **PostgreSQL**.
 
