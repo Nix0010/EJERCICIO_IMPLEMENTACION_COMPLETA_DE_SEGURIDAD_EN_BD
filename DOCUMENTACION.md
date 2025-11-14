@@ -1,87 +1,119 @@
-<div style="text-align:center; font-family:Georgia;">
+_Reporte de Implementación de Seguridad en Bases de Datos_
+=========================================================
 
-<h1><i><u>Trabajo de Base de Datos – Proyecto RRHH</u></i></h1>
+### _PostgreSQL_
 
-<h3><i>Autora: <b>Valery Alarcón</b></i></h3>
-<h3><i>Docente: <b>Hely Suárez</b></i></h3>
+#### _Estudiante: **Valery Alarcón**_
 
-</div>
-
----
-
-<h2><u><i>Objetivo</i></u></h2>
-
-<p style="font-size:17px;">
-Diseñar e implementar una base de datos para el área de Recursos Humanos en PostgreSQL, 
-incluyendo la creación de tablas, vistas, roles, usuarios y la asignación de permisos adecuados.
-</p>
+#### _Docente: **Hely Suárez**_
 
 ---
 
-<h2><u><i>1. Tablas creadas</i></u></h2>
+ _1. Introducción y Principios de Seguridad_
+----------------------------------------------
 
-<h3><i>✧ Tabla <b>empleados</b></i></h3>
-<ul>
-  <li>id_empleado (PK)</li>
-  <li>nombre</li>
-  <li>apellido</li>
-  <li>fecha_contratacion</li>
-  <li>salario</li>
-  <li>id_departamento (FK)</li>
-</ul>
+Este reporte describe la implementación del sistema de **Seguridad, Control de Acceso y Auditoría** para la base de datos _empresa_segura_, utilizando **PostgreSQL**.  
+El diseño se fundamenta en los principios esenciales de seguridad:
 
-<h3><i>✧ Tabla <b>departamentos</b></i></h3>
-<ul>
-  <li>id_departamento (PK)</li>
-  <li>nombre</li>
-</ul>
-
-<h3><i>✧ Tabla <b>historial_salarios</b></i></h3>
-<ul>
-  <li>id_historial (PK)</li>
-  <li>id_empleado (FK)</li>
-  <li>salario_anterior</li>
-  <li>fecha_cambio</li>
-</ul>
+- _Principio de Mínimo Privilegio_: cada usuario solo accede a lo estrictamente necesario.
+- _Confidencialidad, Integridad y Disponibilidad (CID)_: asegurar que la información sea confiable, precisa y accesible.
+- _Trazabilidad y responsabilidad_: todas las operaciones críticas quedan registradas.
 
 ---
 
-<h2><u><i>2. Vistas creadas</i></u></h2>
+ _2. Control de Acceso y Roles Implementados_
+------------------------------------------------
 
-<h3><i>✧ Vista <b>vista_empleados_salario_alto</b></i></h3>
-<p>Muestra los empleados con salario superior al promedio.</p>
+Para garantizar la seguridad, se establecieron **roles y usuarios** con permisos claramente delimitados.
 
-<h3><i>✧ Vista <b>vista_empleados_por_fecha</b></i></h3>
-<p>Ordena empleados por fecha de contratación.</p>
+###  _Rol: admin_rrhh_
 
----
-
-<h2><u><i>3. Roles definidos</i></u></h2>
-
-<h3 style="color:#1a73e8;"><i>🔹 Rol <b>lector_rrhh</b></i></h3>
-<p>Permite únicamente realizar consultas (SELECT) sobre las tablas y vistas.</p>
-
-<h3 style="color:#d93025;"><i>🔹 Rol <b>admin_rrhh</b></i></h3>
-<p>
-Permite acceso total (ALL PRIVILEGES) a todas las tablas y vistas.  
-Incluye login, contraseña y fecha de expiración de 90 días.
-</p>
+- **Tipo:** Rol administrativo con inicio de sesión.
+- **Permisos:** `SELECT`, `INSERT`, `UPDATE`, `DELETE` sobre todas las tablas y vistas.
+- **Función:** Gestionar la información del área de RRHH.
+- **Seguridad:** Contraseña con expiración (`VALID UNTIL 90 days`).
 
 ---
 
-<h2><u><i>4. Usuario creado</i></u></h2>
+###  _Rol: lector_rrhh_
 
-<h3><i>👤 Usuario <b>usuario_consulta</b></i></h3>
-<p>
-Se le asigna el rol <b>lector_rrhh</b>.<br>
-Contraseña: <b>User123.</b>
-</p>
+- **Tipo:** Rol de lectura.
+- **Permisos:**
+  - `SELECT` en todas las tablas (`empleados`, `departamentos`, `historial_salarios`).
+  - `SELECT` en vistas públicas:
+    - `vista_empleados_sin_datos_sensibles`
+    - `vista_empleados_por_fecha`
+    - `vista_empleados_salario_alto`
+- **Función:** Consultas sin riesgo de modificar datos sensibles.
 
 ---
 
-<h2><u><i>5. Sentencias SQL</i></u></h2>
+###  _Usuario: usuario_consulta_
 
-<p><u>Crear rol lector:</u></p>
+- **Permisos:** Exclusivamente hereda el rol `lector_rrhh`.
+- **Función:** Acceder a reportes y realizar consultas seguras.
 
-```sql
-CREATE ROLE lector_rrhh;
+---
+
+ _3. Seguridad a Nivel de Datos mediante Vistas_
+--------------------------------------------------
+
+Para proteger información sensible se implementaron vistas que ocultan campos privados y validan los datos que ingresan a través de ellas.
+
+| _Vista_                               | _Mecanismo de Seguridad_          | _Finalidad_                                      |
+|---------------------------------------|------------------------------------|--------------------------------------------------|
+| `vista_empleados_sin_datos_sensibles` | Oculta `salary` y `birth_date`     | Protección de datos personales (PII).            |
+| `vista_empleados_salario_alto`        | Filtra solo salarios elevados      | Consultas segmentadas sin exponer datos completos. |
+| `vista_empleados_por_fecha`           | `WITH CHECK OPTION` en `hire_date` | Garantiza integridad en cambios.                 |
+
+Estas vistas permiten compartir información sin comprometer la privacidad ni la integridad del sistema.
+
+---
+
+ _4. Auditoría Transaccional y Registro de Cambios_
+-----------------------------------------------------
+
+Se implementó un sistema de auditoría para registrar toda operación crítica realizada sobre la tabla `empleados`.
+
+### ✔ _Tabla de Auditoría: `audit_log`_
+
+Registra:
+
+- Tabla afectada  
+- Tipo de operación (_INSERT_, _UPDATE_, _DELETE_)  
+- Usuario que ejecuta la acción  
+- Fecha y hora  
+- Datos `OLD` y `NEW` en formato **JSONB**
+
+### ✔ _Triggers AFTER_
+
+Se crearon los triggers:
+
+- **AFTER INSERT**
+- **AFTER UPDATE**
+- **AFTER DELETE**
+
+Estos mecanismos garantizan trazabilidad completa y permiten reconstruir cualquier cambio ejecutado por los usuarios del sistema.
+
+---
+
+ _5. Estrategia de Backup y Disponibilidad_
+---------------------------------------------
+
+Para asegurar la disponibilidad del sistema se implementaron procesos de respaldo y restauración:
+
+- **Backups completos** mediante `pg_dump`.
+- **Restauraciones** con `pg_restore`.
+- Revisión y documentación de la configuración **WAL (Write-Ahead Log)**.
+
+Esto permite recuperar la base de datos ante:
+
+- fallos del sistema,  
+- pérdida de datos,  
+- errores humanos,  
+- corrupción de archivos.
+
+La estrategia garantiza continuidad operativa y mínima pérdida de información.
+
+---
+
