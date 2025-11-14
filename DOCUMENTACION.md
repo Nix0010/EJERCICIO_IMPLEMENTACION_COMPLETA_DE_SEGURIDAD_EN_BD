@@ -1,11 +1,11 @@
 
-# 📄 Reporte de Implementación de Seguridad en Bases de Datos (PostgreSQL)
+# Reporte de Implementación de Seguridad en Bases de Datos (PostgreSQL)
 
 ## 1. Introducción y Principios de Seguridad
 Este reporte documenta la implementación completa de un sistema de **Seguridad y Administración** para la base de datos ficticia `empresa_segura`, utilizando **PostgreSQL**. La arquitectura se basa en los siguientes principios:
 
-- **🔑 Principio de Mínimo Privilegio**: Limitar el acceso de los usuarios a solo los recursos y permisos estrictamente necesarios.
-- **🛡️ Modelo de Confidencialidad, Integridad y Disponibilidad (CID)**: Asegurar que los datos sensibles están protegidos, que son exactos y que siempre son accesibles.
+- ** Principio de Mínimo Privilegio**: Limitar el acceso de los usuarios a solo los recursos y permisos estrictamente necesarios.
+- ** Modelo de Confidencialidad, Integridad y Disponibilidad (CID)**: Asegurar que los datos sensibles están protegidos, que son exactos y que siempre son accesibles.
 
 ---
 
@@ -19,7 +19,7 @@ Se establecieron tres roles/usuarios distintos para aislar las responsabilidades
 | `analista_bi`   | SELECT en **ALL TABLES IN SCHEMA public**    | Solo capacidad de lectura. Garantiza que los informes y análisis no comprometan la integridad de los datos. |
 | `desarrollador` | SELECT, INSERT, UPDATE en **ALL TABLES IN SCHEMA public** | Otorga permisos para el ciclo de desarrollo, excluyendo explícitamente DELETE para prevenir pérdidas de datos catastróficas. |
 
-🔐 **Política de Expiración**:  
+ **Política de Expiración**:  
 PostgreSQL no gestiona la expiración de contraseñas directamente con la cláusula `CREATE USER`. Esta política debe implementarse mediante un servidor de autenticación externo (como **LDAP**) o una herramienta de gestión de cuentas que rote las contraseñas cada **90 días**.
 
 ---
