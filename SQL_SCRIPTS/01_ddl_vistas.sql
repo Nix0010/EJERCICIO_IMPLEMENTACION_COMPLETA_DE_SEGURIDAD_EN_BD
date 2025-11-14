@@ -1,12 +1,6 @@
 
--- -----------------------------------------------------------
--- Archivo 00: Creación de la Base de Datos y Tablas (DDL)
--- Propósito: Establecer la estructura base del esquema 'seguridad_empresa'.
--- -----------------------------------------------------------
-
-/* ======================================================
    01 - DEFINICIÓN DE TABLAS
-   ====================================================== */
+  
 CREATE TABLE IF NOT EXISTS departamentos (
     id_departamento SERIAL PRIMARY KEY,
     nombre VARCHAR(100) UNIQUE NOT NULL,
@@ -35,14 +29,10 @@ CREATE TABLE IF NOT EXISTS salarios (
 );  
 
 
--- -----------------------------------------------------------
--- Archivo 01: Vistas de Seguridad (Protección de Datos)
--- Propósito: Implementar vistas para ocultar PII y aplicar controles de integridad.
--- -----------------------------------------------------------
 
-/* ======================================================
+
    02 - VISTAS DE SEGURIDAD
-   ====================================================== */
+ 
 
 -- 1. Vista de empleados sin datos sensibles (PII como salario, correo)
 CREATE OR REPLACE VIEW vista_empleados_sin_datos_sensibles AS
