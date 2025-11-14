@@ -33,6 +33,6 @@ CREATE TRIGGER trg_auditoria_departamentos
 AFTER INSERT OR UPDATE OR DELETE ON departamentos
 FOR EACH ROW EXECUTE FUNCTION insertar_auditoria();
 
-CREATE TRIGGER trg_auditoria_historial_salarios
+CREATE TRIGGER trg_auditoria_salarios
 AFTER INSERT OR UPDATE OR DELETE ON historial_salarios
 FOR EACH ROW EXECUTE FUNCTION insertar_auditoria();
